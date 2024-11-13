@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadGoogleSheetData() {
-  fetch("https://script.google.com/macros/s/AKfycbzcf_YCkseAcPCzpwMupsQMCm9XCn0gFM9QvO4b9HiO6OJmTOhgEE8o-qGKGgLDLAB6nQ/exec") // Replace with your web app URL
+  fetch("https://script.google.com/macros/s/AKfycbzwxGvC7bRWRc2yRyrgib9F7IOvtuw3Qx69Z8Qt8I7LDaU-PDKjBka8IVbHKtHW9flx/exec") // Replace with your web app URL
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok " + response.statusText);

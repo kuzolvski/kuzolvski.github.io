@@ -5,7 +5,7 @@ let filteredData = []; // New array to hold filtered data
 
 // Function to fetch data from Google Sheets
 async function fetchData() {
-  const response = await fetch("https://script.google.com/macros/s/AKfycbxZEiBOPb2MmtjkbjC8B3_AutODnoCPaVYorDqh1wXK0v_oG9FDeY_jgBXRt3tYzOdA/exec"); // Replace with your web app URL
+  const response = await fetch("https://script.google.com/macros/s/AKfycbzrXUb_Sb_QhELUwkfQzo34gKgX04HXW2qxRA-ndWeSydz1DXVMEsVdJMgqcJ1-8jfYng/exec"); // Replace with your web app URL
   const data = await response.json();
   historyData = data; // Store the fetched data
   filteredData = historyData; // Initialize filtered data
