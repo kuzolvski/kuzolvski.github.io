@@ -1,0 +1,200 @@
+body {
+  font-family: "DM Sans", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #e9d9d7;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #855d5d;
+  color: #fff;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+}
+
+header p {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+nav {
+  background-color: #ba8383;
+  display: flex; /* Use flexbox instead of float */
+  justify-content: space-around; /* Space links evenly */
+  overflow: hidden;
+}
+
+nav a {
+  display: block;
+  color: #fff;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+nav a:hover {
+  background-color: #e9d9d7;
+  color: #855d5d;
+}
+
+.container {
+  padding: 2rem;
+  flex: 1;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
+table,
+th,
+td {
+  border: 1px solid #ba8383;
+}
+
+th,
+td {
+  padding: 1rem;
+  text-align: left;
+}
+
+th {
+  background-color: #ba8383;
+  color: #fff;
+}
+
+/* Search Box Styles */
+.search-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+#commissions-filter #history-filter {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 200px; /* Adjust width as needed */
+}
+
+/* Progress Bar Styles */
+.progress-bar {
+  width: 100%;
+  background-color: #f0c4c4; /* Light grayish-red background */
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 5px; /* Space above the progress bar */
+}
+
+.progress {
+  height: 20px; /* Height of the progress bar */
+  background-color: #855d5d; /* Darker shade of the primary color */
+  width: 0; /* Initial width */
+  transition: width 0.5s; /* Smooth transition */
+}
+
+.status i {
+  font-size: 1.5rem;
+}
+
+.status .success {
+  color: green;
+}
+
+.status .failed {
+  color: red;
+}
+
+.hidden {
+  display: none;
+}
+
+footer {
+  background-color: #855d5d;
+  color: #fff;
+  text-align: center;
+  padding: 1rem 0;
+  margin-top: auto; /* Ensures footer stays at the bottom */
+}
+
+footer .social-icons a {
+  color: #fff;
+  margin: 0 10px;
+  text-decoration: none;
+  font-size: 1.5rem;
+}
+
+footer .social-icons a:hover {
+  color: #e9d9d7;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.pagination button {
+  background-color: transparent;
+  color: #ba8383;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.pagination button:hover {
+  color: #855d5d;
+}
+
+.pagination button:disabled {
+  color: #ddd;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column; /* Stack links vertically on smaller screens */
+  }
+
+  nav a {
+    width: 100%; /* Full width for mobile */
+    text-align: left;
+    padding: 10px;
+  }
+
+  .progress-bar {
+    flex-direction: column;
+  }
+
+  th,
+  td {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  header p {
+    font-size: 1rem;
+  }
+
+  th,
+  td {
+    font-size: 0.8rem;
+  }
+}

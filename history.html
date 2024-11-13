@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kuzolvskicomm - Commission History</title>
+    <link rel="icon" href="img/PNGlogo.png" type="image/logo" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header>
+      <h1>Commission Status</h1>
+      <p>Kuzolvski Commission Website</p>
+    </header>
+    <nav>
+      <a href="index.html">Commissions</a>
+      <a href="history.html">History</a>
+    </nav>
+    <div class="container" id="history">
+      <h2>Commission History</h2>
+      <div class="table-header">
+        <div class="search-container">
+          <input type="text" id="history-filter" placeholder="Search History..." onkeyup="filterTable('history-table', 'history-filter')" />
+        </div>
+      </div>
+      <table id="history-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Start Date</th>
+            <th>Type</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be populated from Google Sheets -->
+        </tbody>
+      </table>
+      <div class="pagination">
+        <button id="history-table-prev" onclick="changePage(-1)">&larr; Previous</button>
+        <button id="history-table-next" onclick="changePage(1)">Next &rarr;</button>
+      </div>
+    </div>
+    <footer>
+      <p>&copy; 2023 Kuzolvskicomm. All rights reserved.</p>
+      <div class="social-icons">
+        <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+    </footer>
+    <script src="js/history.js"></script>
+  </body>
+</html>
