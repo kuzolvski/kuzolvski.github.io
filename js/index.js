@@ -97,9 +97,9 @@ function filterTable(tableId, filterId) {
 function getProgressPercentage(progress) {
   switch (progress) {
     case "Sketching":
-      return 25;
+      return 33;
     case "Rendering":
-      return 50;
+      return 66;
     case "Finished":
       return 100;
     default:
