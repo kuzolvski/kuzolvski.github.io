@@ -19,7 +19,6 @@
     <nav>
       <a href="index.html">Commissions</a>
       <a href="history.html">History</a>
-      <!-- Link to history.html -->
     </nav>
     <div class="container" id="commissions">
       <h2>Current Commissions</h2>
@@ -28,7 +27,7 @@
           <input type="text" id="commissions-filter" placeholder="Search Commissions..." onkeyup="filterTable('commissions-table', 'commissions-filter')" />
         </div>
       </div>
-      <table id="commissions-table">
+      <table id="commissions-table" class="table-main">
         <thead>
           <tr>
             <th>Name</th>
@@ -44,8 +43,13 @@
         </tbody>
       </table>
       <div class="pagination">
-        <button id="commissions-table-prev" onclick="changePage('commissions-table', -1)">&larr; Previous</button>
-        <button id="commissions-table-next" onclick="changePage('commissions-table', 1)">Next &rarr;</button>
+        <div class="pagination-controls">
+          <button id="commissions-table-first" onclick="changePage('commissions-table','first')"><<</button>
+          <button id="commissions-table-prev" onclick="changePage('commissions-table', -1)">&larr;</button>
+          <span id="page-numbers"></span>
+          <button id="commissions-table-next" onclick="changePage('commissions-table', 1)">&rarr;</button>
+          <button id="commissions-table-last" onclick="changePage('commissions-table', 'last')">>></button>
+        </div>
       </div>
     </div>
     <footer>

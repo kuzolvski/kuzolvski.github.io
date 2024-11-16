@@ -6,36 +6,87 @@ let filteredData = []; // New array to hold filtered data
 function paginateTable(tableId, page) {
   const table = document.getElementById(tableId);
   const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-  const totalPages = Math.ceil(rows.length / rowsPerPage);
 
+  // Calculate total pages based on filtered data or original data
+  const totalData = filteredData.length > 0 ? filteredData.length : commissionsData.length;
+  const totalPages = Math.ceil(totalData / rowsPerPage);
+
+  // Hide all rows
   for (let i = 0; i < rows.length; i++) {
-    rows[i].style.display = "none"; // Hide all rows
+    rows[i].style.display = "none";
   }
 
-  for (let i = (page - 1) * rowsPerPage; i < page * rowsPerPage && i < rows.length; i++) {
-    rows[i].style.display = ""; // Show rows for the current page
+  // Show rows for the current page
+  for (let i = (page - 1) * rowsPerPage; i < page * rowsPerPage && i < totalData; i++) {
+    rows[i].style.display = "";
   }
 
-  document.getElementById(`${tableId}-prev`).disabled = page === 1; // Disable previous button on first page
-  document.getElementById(`${tableId}-next`).disabled = page === totalPages; // Disable next button on last page
+  // Disable buttons based on the current page
+  document.getElementById("commissions-table-prev").disabled = page === 1;
+  document.getElementById("commissions-table-next").disabled = page === totalPages;
+
+  renderPageNumbers(totalPages);
+}
+
+function renderPageNumbers(totalPages) {
+  const pageNumbersContainer = document.getElementById("page-numbers");
+  pageNumbersContainer.innerHTML = "";
+
+  const maxVisiblePages = 3;
+  let startPage, endPage;
+
+  if (totalPages <= maxVisiblePages) {
+    startPage = 1;
+    endPage = totalPages;
+  } else {
+    const halfVisible = Math.floor(maxVisiblePages / 2);
+    startPage = Math.max(1, currentPage - halfVisible);
+    endPage = Math.min(totalPages, currentPage + halfVisible);
+
+    if (startPage === 1) {
+      endPage = Math.min(maxVisiblePages, totalPages);
+    } else if (endPage === totalPages) {
+      startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+    }
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    const pageButton = document.createElement("button");
+    pageButton.innerText = i;
+    pageButton.className = currentPage === i ? "active" : "";
+    pageButton.onclick = () => {
+      currentPage = i;
+      paginateTable("commissions-table", currentPage);
+    };
+    pageNumbersContainer.appendChild(pageButton);
+  }
 }
 
 function changePage(tableId, direction) {
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage); // Use filtered data length
+  const totalData = filteredData.length > 0 ? filteredData.length : commissionsData.length;
+  const totalPages = Math.ceil(totalData / rowsPerPage);
 
-  currentPage += direction; // Change the current page by direction
-  if (currentPage < 1) currentPage = 1; // Prevent going to a page less than 1
-  if (currentPage > totalPages) currentPage = totalPages; // Prevent going to a page greater than total pages
+  if (direction === "first") {
+    currentPage = 1;
+  } else if (direction === "last") {
+    currentPage = totalPages;
+  } else {
+    currentPage += direction;
+  }
 
-  paginateTable(tableId, currentPage); // Call paginateTable to update the display
+  // Ensure currentPage stays within bounds
+  if (currentPage < 1) currentPage = 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  paginateTable(tableId, currentPage);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadGoogleSheetData(); // Load data when the DOM is fully loaded
+  loadGoogleSheetData();
 });
 
 function loadGoogleSheetData() {
-  fetch("https://script.google.com/macros/s/AKfycbzwxGvC7bRWRc2yRyrgib9F7IOvtuw3Qx69Z8Qt8I7LDaU-PDKjBka8IVbHKtHW9flx/exec") // Replace with your web app URL
+  fetch("https://script.google.com/macros/s/AKfycbzwxGvC7bRWRc2yRyrgib9F7IOvtuw3Qx69Z8Qt8I7LDaU-PDKjBka8IVbHKtHW9flx/exec")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok " + response.statusText);
@@ -43,40 +94,53 @@ function loadGoogleSheetData() {
       return response.json();
     })
     .then((data) => {
-      commissionsData = data; // Store the fetched data
-      filteredData = commissionsData; // Initialize filtered data
-      currentPage = 1; // Reset current page to 1
-      populateCommissionsTable(); // Populate the table with data
-      paginateTable("commissions-table", currentPage); // Paginate the table
+      commissionsData = data;
+      filteredData = commissionsData;
+      currentPage = 1;
+      if (commissionsData.length === 0) {
+        displayNoRecordsMessage();
+      } else {
+        populateCommissionsTable();
+        paginateTable("commissions-table", currentPage);
+      }
     })
     .catch((error) => console.error("Error fetching data:", error));
 }
 
+function displayNoRecordsMessage() {
+  const tableBody = document.querySelector("#commissions-table tbody");
+  tableBody.innerHTML = "<tr><td colspan='6'>No records available.</td></tr>";
+  document.getElementById("commissions-table-prev").disabled = true;
+  document.getElementById("commissions-table-next").disabled = true;
+}
+
 function populateCommissionsTable() {
   const tableBody = document.querySelector("#commissions-table tbody");
-  tableBody.innerHTML = ""; // Clear existing rows
+  tableBody.innerHTML = "";
 
-  const dataToDisplay = filteredData.length > 0 ? filteredData : commissionsData; // Use filtered data if available
+  const dataToDisplay = filteredData.length > 0 ? filteredData : commissionsData;
 
   dataToDisplay.forEach((item) => {
     const row = document.createElement("tr");
-    const progressValue = item.progress; // Assuming progress is a string like "Sketching", "Rendering", or "Finished"
-    const progressPercentage = getProgressPercentage(progressValue); // Get the percentage based on the progress
+    const progressValue = item.progress;
+    const progressPercentage = getProgressPercentage(progressValue);
+
+    const statusClass = item.status.toLowerCase() === "confirmed" ? "status-confirmed" : "";
 
     row.innerHTML = `
-      <td>${item.name}</td>
-      <td>${item.status !== undefined ? item.status : "N/A"}</td> <!-- New Status data -->
-      <td>${formatDate(item.startDate)}</td>
-      <td>${item.type}</td>
-      <td>${item.estimatedTime !== undefined ? item.estimatedTime : "N/A"}</td>
-      <td>
-        ${progressValue !== undefined ? progressValue : "N/A"}
-        <div class="progress-bar">
-          <div class="progress" style="width: ${progressPercentage}%;"></div>
-        </div>
-      </td>
-    `;
-    tableBody.appendChild(row); // Append the new row to the table body
+            <td>${item.name}</td>
+            <td class="${statusClass}">${item.status !== undefined ? item.status : "N/A"}</td>
+            <td>${formatDate(item.startDate)}</td>
+            <td>${item.type}</td>
+            <td>${item.estimatedTime !== undefined ? item.estimatedTime : "N/A"}</td>
+            <td>
+                ${progressValue !== undefined ? progressValue : "N/A"}
+                <div class="progress-bar">
+                    <div class="progress" style="width: ${progressPercentage}%;"></div>
+                </div>
+            </td>
+        `;
+    tableBody.appendChild(row);
   });
 }
 
@@ -84,14 +148,17 @@ function filterTable(tableId, filterId) {
   const input = document.getElementById(filterId);
   const filter = input.value.toLowerCase();
 
-  // Filter the commissionsData based on the input
   filteredData = commissionsData.filter((item) => {
     return Object.values(item).some((value) => String(value).toLowerCase().includes(filter));
   });
 
-  currentPage = 1; // Reset to the first page after filtering
-  populateCommissionsTable(); // Populate the table with filtered data
-  paginateTable(tableId, currentPage); // Update pagination based on filtered data
+  currentPage = 1;
+  if (filteredData.length === 0) {
+    displayNoRecordsMessage();
+  } else {
+    populateCommissionsTable();
+    paginateTable(tableId, currentPage);
+  }
 }
 
 function getProgressPercentage(progress) {
@@ -108,6 +175,10 @@ function getProgressPercentage(progress) {
 }
 
 function formatDate(dateString) {
+  if (dateString === "-") {
+    return "-";
+  }
+  const date = new Date(dateString);
   const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(dateString).toLocaleDateString(undefined, options);
+  return date.toLocaleDateString(undefined, options);
 }
