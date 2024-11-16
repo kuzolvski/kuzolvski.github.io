@@ -22,10 +22,10 @@
       <h2>Commission History</h2>
       <div class="table-header">
         <div class="search-container">
-          <input type="text" id="history-filter" placeholder="Search History..." onkeyup="filterTable('history-table', 'history-filter')" />
+          <input type="text" id="history-filter" placeholder="Search History ..." onkeyup="filterTable('history-table', 'history-filter')" />
         </div>
       </div>
-      <table id="history-table">
+      <table id="history-table" class="table">
         <thead>
           <tr>
             <th>Name</th>
@@ -39,8 +39,13 @@
         </tbody>
       </table>
       <div class="pagination">
-        <button id="history-table-prev" onclick="changePage(-1)">&larr; Previous</button>
-        <button id="history-table-next" onclick="changePage(1)">Next &rarr;</button>
+        <div class="pagination-controls">
+          <button id="history-table-first" onclick="changePage('first')"><<</button>
+          <button id="history-table-prev" onclick="changePage(-1)">&larr;</button>
+          <div id="page-numbers"></div>
+          <button id="history-table-next" onclick="changePage(1)">&rarr;</button>
+          <button id="history-table-last" onclick="changePage('last')">>></button>
+        </div>
       </div>
     </div>
     <footer>

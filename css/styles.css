@@ -26,9 +26,10 @@ header p {
 
 nav {
   background-color: #ba8383;
-  display: flex; /* Use flexbox instead of float */
-  justify-content: space-around; /* Space links evenly */
+  display: flex;
+  justify-content: space-around;
   overflow: hidden;
+  border-radius: 0px;
 }
 
 nav a {
@@ -37,6 +38,7 @@ nav a {
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+  font-weight: bold;
 }
 
 nav a:hover {
@@ -50,27 +52,122 @@ nav a:hover {
   overflow-x: auto;
 }
 
-table {
+/* Common table styles for both index and history tables */
+.table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 2rem;
 }
 
-table,
-th,
-td {
-  border: 1px solid #ba8383;
+.table,
+.table th,
+.table td {
+  border: 1px solid #ba8383; /* Uniform border for all cells */
 }
 
-th,
-td {
+.table th,
+.table td {
   padding: 1rem;
-  text-align: left;
+  text-align: center;
 }
 
-th {
+/* Set fixed widths for each column */
+.table th:nth-child(1), /* Name */
+.table td:nth-child(1) {
+  width: 25%; /* Adjust as needed */
+}
+
+.table th:nth-child(2), /* Start Date */
+.table td:nth-child(2) {
+  width: 25%; /* Adjust as needed */
+}
+
+.table th:nth-child(3), /* Type */
+.table td:nth-child(3) {
+  width: 25%; /* Adjust as needed */
+}
+
+.table th:nth-child(4), /* Status */
+.table td:nth-child(4) {
+  width: 25%; /* Adjust as needed */
+}
+
+.table th {
   background-color: #ba8383;
   color: #fff;
+}
+
+/* Remove border-radius from header cells */
+.table th:first-child {
+  border-top-left-radius: 0; /* No rounded corners */
+}
+
+.table th:last-child {
+  border-top-right-radius: 0; /* No rounded corners */
+}
+
+/* Commission table */
+.table-main {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
+.table-main,
+.table-main th,
+.table-main td {
+  border: 1px solid #ba8383; /* Uniform border for all cells */
+}
+
+.table-main th,
+.table-main td {
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Set fixed widths for each column */
+.table-main th:nth-child(1), /* Name */
+.table-main td:nth-child(1) {
+  width: 25%; /* Adjust as needed */
+}
+
+.table-main th:nth-child(2), /* Status */
+.table-main td:nth-child(2) {
+  width: 10%; /* Adjust as needed */
+}
+
+.table-main th:nth-child(3), /* Start Date */
+.table-main td:nth-child(3) {
+  width: 15%; /* Adjust as needed */
+}
+
+.table-main th:nth-child(4), /* Type */
+.table-main td:nth-child(4) {
+  width: 15%; /* Adjust as needed */
+}
+
+.table-main th:nth-child(5), /* Estimated Time */
+.table-main td:nth-child(5) {
+  width: 15%; /* Adjust as needed */
+}
+
+.table-main th:nth-child(6), /* Progress bar */
+.table-main td:nth-child(6) {
+  width: 20%; /* Adjust as needed */
+}
+
+.table-main th {
+  background-color: #ba8383;
+  color: #fff;
+}
+
+/* Remove border-radius from header cells */
+.table-main th:first-child {
+  border-top-left-radius: 0; /* No rounded corners */
+}
+
+.table-main th:last-child {
+  border-top-right-radius: 0; /* No rounded corners */
 }
 
 /* Search Box Styles */
@@ -80,14 +177,14 @@ th {
   margin-bottom: 10px;
 }
 
-#commissions-filter #history-filter {
+#commissions-filter,
+#history-filter {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 200px; /* Adjust width as needed */
+  width: 200px; /* Adjust width as needed*/
 }
 
-/* Progress Bar Styles */
 .progress-bar {
   width: 100%;
   background-color: #f0c4c4; /* Light grayish-red background */
@@ -103,20 +200,63 @@ th {
   transition: width 0.5s; /* Smooth transition */
 }
 
-.status i {
-  font-size: 1.5rem;
+/* Pagination Styles */
+/* Pagination Styles */
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Center items vertically */
+  margin-top: 1rem;
 }
 
-.status .success {
-  color: green;
+.pagination-controls {
+  display: flex;
+  align-items: center; /* Center items vertically */
+  border: none; /* Remove border around the pagination controls */
+  padding: 0; /* Remove padding */
+  background-color: transparent; /* Make background transparent */
 }
 
-.status .failed {
-  color: red;
+.pagination-controls button {
+  background-color: transparent; /* Make button background transparent */
+  color: #855d5d; /* Darker text color */
+  border: 1px solid #ba8383; /* Add border to buttons */
+  border-radius: 5px; /* Rounded corners */
+  padding: 0.5rem 1rem; /* Padding */
+  margin: 0 0.25rem; /* Space between buttons */
+  cursor: pointer;
+  font-size: 14px; /* Adjusted font size */
+  line-height: 20px; /* Adjusted line height */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
 }
 
-.hidden {
-  display: none;
+.pagination-controls button:hover {
+  background-color: #e9d9d7; /* Light background on hover */
+  color: #855d5d; /* Darker text color on hover */
+}
+
+.pagination-controls button.active {
+  font-weight: bold; /* Highlight the active page */
+  background-color: #855d5d; /* Darker background for active page */
+  color: #fff; /* White text for active page */
+}
+
+.pagination-controls button:disabled {
+  color: #ddd; /* Disabled text color */
+  cursor: not-allowed;
+  background-color: transparent; /* Make disabled button background transparent */
+}
+
+/* Add a "..." button style for ellipsis */
+.pagination-controls .ellipsis {
+  background-color: transparent; /* Transparent background */
+  color: #855d5d; /* Darker text color */
+  border: none; /* No border */
+  cursor: default; /* Default cursor */
+  padding: 0.5rem 1rem; /* Padding */
+  font-size: 14px; /* Adjusted font size */
+  line-height: 20px; /* Adjusted line height */
 }
 
 footer {
@@ -138,29 +278,9 @@ footer .social-icons a:hover {
   color: #e9d9d7;
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-}
-
-.pagination button {
-  background-color: transparent;
-  color: #ba8383;
-  border: none;
-  padding: 0.5rem 1rem;
-  margin: 0 0.25rem;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.pagination button:hover {
-  color: #855d5d;
-}
-
-.pagination button:disabled {
-  color: #ddd;
-  cursor: not-allowed;
+.status-confirmed {
+  color: green; /* Change to your desired color */
+  font-weight: bold; /* Optional: make it bold */
 }
 
 @media (max-width: 768px) {
@@ -169,32 +289,28 @@ footer .social-icons a:hover {
   }
 
   nav a {
-    width: 100%; /* Full width for mobile */
-    text-align: left;
-    padding: 10px;
+    padding: 10px; /* Adjust padding for smaller screens */
   }
 
-  .progress-bar {
-    flex-direction: column;
+  .search-container {
+    flex-direction: column; /* Stack search box on smaller screens */
+    align-items: flex-end; /* Align search box to the right */
   }
 
-  th,
-  td {
-    padding: 0.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  header h1 {
-    font-size: 1.5rem;
+  #commissions-filter {
+    width: 100%; /* Full width on smaller screens */
+    margin-top: 10px; /* Space above the search box */
   }
 
-  header p {
-    font-size: 1rem;
+  .table {
+    font-size: 0.9rem; /* Smaller font size for tables on smaller screens */
   }
 
-  th,
-  td {
-    font-size: 0.8rem;
+  .table-main {
+    font-size: 0.9rem; /* Smaller font size for tables on smaller screens */
+  }
+
+  .pagination {
+    flex-direction: column; /* Stack pagination buttons vertically */
   }
 }
