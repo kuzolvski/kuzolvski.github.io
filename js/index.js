@@ -32,7 +32,7 @@ function renderPageNumbers(totalPages) {
   const pageNumbersContainer = document.getElementById("page-numbers");
   pageNumbersContainer.innerHTML = "";
 
-  const maxVisiblePages = 3;
+  const maxVisiblePages = window.innerWidth < 440 ? 1 : 3; // Show 1 page button on small screens, 3 on larger screens
   let startPage, endPage;
 
   if (totalPages <= maxVisiblePages) {
@@ -126,10 +126,11 @@ function populateCommissionsTable() {
     const progressPercentage = getProgressPercentage(progressValue);
 
     const statusClass = item.status.toLowerCase() === "confirmed" ? "status-confirmed" : "";
+    const inProgressClass = item.status.toLowerCase() === "in progress" ? "status-in-progress" : ""; // New class for "In Progress"
 
     row.innerHTML = `
             <td>${item.name}</td>
-            <td class="${statusClass}">${item.status !== undefined ? item.status : "N/A"}</td>
+            <td class="${statusClass} ${inProgressClass}">${item.status !== undefined ? item.status : "N/A"}</td>
             <td>${formatDate(item.startDate)}</td>
             <td>${item.type}</td>
             <td>${item.estimatedTime !== undefined ? item.estimatedTime : "N/A"}</td>
@@ -143,7 +144,6 @@ function populateCommissionsTable() {
     tableBody.appendChild(row);
   });
 }
-
 function filterTable(tableId, filterId) {
   const input = document.getElementById(filterId);
   const filter = input.value.toLowerCase();

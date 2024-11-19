@@ -50,7 +50,7 @@ function renderPageNumbers(totalItems) {
   const pageNumbersContainer = document.getElementById("page-numbers");
   pageNumbersContainer.innerHTML = "";
   const totalPages = Math.ceil(totalItems / rowsPerPage);
-  const maxVisiblePages = 3; // Maximum number of page buttons to show
+  const maxVisiblePages = window.innerWidth < 440 ? 1 : 3; // Show 1 page button on small screens, 3 on larger screens
   let startPage, endPage;
 
   if (totalPages <= maxVisiblePages) {

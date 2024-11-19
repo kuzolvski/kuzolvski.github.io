@@ -283,6 +283,11 @@ footer .social-icons a:hover {
   font-weight: bold; /* Optional: make it bold */
 }
 
+.status-in-progress {
+  color: #4e9fe5; /* Change to your desired color */
+  font-weight: bold; /* Optional: make it bold */
+}
+
 @media (max-width: 768px) {
   nav {
     flex-direction: column; /* Stack links vertically on smaller screens */
