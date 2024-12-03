@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadGoogleSheetData() {
-  fetch("https://script.google.com/macros/s/AKfycbzwxGvC7bRWRc2yRyrgib9F7IOvtuw3Qx69Z8Qt8I7LDaU-PDKjBka8IVbHKtHW9flx/exec")
+  fetch("https://script.google.com/macros/s/AKfycbzcf_YCkseAcPCzpwMupsQMCm9XCn0gFM9QvO4b9HiO6OJmTOhgEE8o-qGKGgLDLAB6nQ/exec")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok " + response.statusText);
@@ -94,12 +94,15 @@ function loadGoogleSheetData() {
       return response.json();
     })
     .then((data) => {
-      commissionsData = data;
+      console.log(data); // Log the data to inspect its structure
+      commissionsData = data.slice(1); // Exclude the first entry which is the month's name
       filteredData = commissionsData;
       currentPage = 1;
       if (commissionsData.length === 0) {
         displayNoRecordsMessage();
       } else {
+        // Set the month's name
+        document.getElementById("month-name").innerText = data[0].month; // Access the month's name correctly
         populateCommissionsTable();
         paginateTable("commissions-table", currentPage);
       }

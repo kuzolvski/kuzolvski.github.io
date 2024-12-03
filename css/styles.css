@@ -288,6 +288,11 @@ footer .social-icons a:hover {
   font-weight: bold; /* Optional: make it bold */
 }
 
+#month-name {
+  font-size: 1.5rem;
+  color: #855d5d;
+}
+
 @media (max-width: 768px) {
   nav {
     flex-direction: column; /* Stack links vertically on smaller screens */
