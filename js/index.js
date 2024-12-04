@@ -94,12 +94,15 @@ function loadGoogleSheetData() {
       return response.json();
     })
     .then((data) => {
-      commissionsData = data;
+      console.log(data); // Log the data to inspect its structure
+      commissionsData = data.slice(1); // Exclude the first entry which is the month's name
       filteredData = commissionsData;
       currentPage = 1;
       if (commissionsData.length === 0) {
         displayNoRecordsMessage();
       } else {
+        // Set the month's name
+        document.getElementById("month-name").innerText = data[0].month; // Access the month's name correctly
         populateCommissionsTable();
         paginateTable("commissions-table", currentPage);
       }
