@@ -274,6 +274,18 @@ footer .social-icons a {
   font-size: 1.5rem;
 }
 
+footer ol {
+  margin: 10px 20px; /* Add margin above and below the list */
+  padding: 0; /* Remove default padding */
+  text-align: left;
+  display: inline-block;
+}
+
+footer ol li {
+  line-height: 1.5; /* Increase line height for better readability */
+  font-size: 0.8rem;
+}
+
 footer .social-icons a:hover {
   color: #e9d9d7;
 }
