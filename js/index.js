@@ -1,14 +1,26 @@
-let currentPage = 1;
-const rowsPerPage = 10;
+let currentConfirmedPage = 1;
+let currentWaitlistPage = 1;
+const rowsPerPage = 7;
 let commissionsData = [];
-let filteredData = []; // New array to hold filtered data
+let confirmedData = [];
+let waitlistData = [];
+let filteredConfirmedData = [];
+let filteredWaitlistData = [];
 
 function paginateTable(tableId, page) {
   const table = document.getElementById(tableId);
   const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
 
-  // Calculate total pages based on filtered data or original data
-  const totalData = filteredData.length > 0 ? filteredData.length : commissionsData.length;
+  // Determine which dataset to use based on the table ID
+  let totalData, filteredData;
+  if (tableId === "confirmed-table") {
+    totalData = filteredConfirmedData.length > 0 ? filteredConfirmedData.length : confirmedData.length;
+    currentConfirmedPage = page;
+  } else if (tableId === "waitlist-table") {
+    totalData = filteredWaitlistData.length > 0 ? filteredWaitlistData.length : waitlistData.length;
+    currentWaitlistPage = page;
+  }
+
   const totalPages = Math.ceil(totalData / rowsPerPage);
 
   // Hide all rows
@@ -18,21 +30,41 @@ function paginateTable(tableId, page) {
 
   // Show rows for the current page
   for (let i = (page - 1) * rowsPerPage; i < page * rowsPerPage && i < totalData; i++) {
-    rows[i].style.display = "";
+    if (i < rows.length) {
+      rows[i].style.display = "";
+    }
   }
 
   // Disable buttons based on the current page
-  document.getElementById("commissions-table-prev").disabled = page === 1;
-  document.getElementById("commissions-table-next").disabled = page === totalPages;
+  const prevBtn = document.getElementById(`${tableId}-prev`);
+  const nextBtn = document.getElementById(`${tableId}-next`);
+  const firstBtn = document.getElementById(`${tableId}-first`);
+  const lastBtn = document.getElementById(`${tableId}-last`);
 
-  renderPageNumbers(totalPages);
+  if (prevBtn && nextBtn && firstBtn && lastBtn) {
+    prevBtn.disabled = page === 1;
+    nextBtn.disabled = page === totalPages;
+    firstBtn.disabled = page === 1;
+    lastBtn.disabled = page === totalPages;
+  }
+
+  renderPageNumbers(tableId, totalPages, page);
 }
 
-function renderPageNumbers(totalPages) {
-  const pageNumbersContainer = document.getElementById("page-numbers");
+function renderPageNumbers(tableId, totalPages, currentPage) {
+  let pageNumbersId;
+  if (tableId === "confirmed-table") {
+    pageNumbersId = "confirmed-page-numbers";
+  } else if (tableId === "waitlist-table") {
+    pageNumbersId = "waitlist-page-numbers";
+  }
+
+  const pageNumbersContainer = document.getElementById(pageNumbersId);
+  if (!pageNumbersContainer) return;
+
   pageNumbersContainer.innerHTML = "";
 
-  const maxVisiblePages = window.innerWidth < 440 ? 1 : 3; // Show 1 page button on small screens, 3 on larger screens
+  const maxVisiblePages = window.innerWidth < 440 ? 1 : 3;
   let startPage, endPage;
 
   if (totalPages <= maxVisiblePages) {
@@ -55,15 +87,23 @@ function renderPageNumbers(totalPages) {
     pageButton.innerText = i;
     pageButton.className = currentPage === i ? "active" : "";
     pageButton.onclick = () => {
-      currentPage = i;
-      paginateTable("commissions-table", currentPage);
+      paginateTable(tableId, i);
     };
     pageNumbersContainer.appendChild(pageButton);
   }
 }
 
 function changePage(tableId, direction) {
-  const totalData = filteredData.length > 0 ? filteredData.length : commissionsData.length;
+  let currentPage, totalData;
+
+  if (tableId === "confirmed-table") {
+    currentPage = currentConfirmedPage;
+    totalData = filteredConfirmedData.length > 0 ? filteredConfirmedData.length : confirmedData.length;
+  } else if (tableId === "waitlist-table") {
+    currentPage = currentWaitlistPage;
+    totalData = filteredWaitlistData.length > 0 ? filteredWaitlistData.length : waitlistData.length;
+  }
+
   const totalPages = Math.ceil(totalData / rowsPerPage);
 
   if (direction === "first") {
@@ -94,74 +134,146 @@ function loadGoogleSheetData() {
       return response.json();
     })
     .then((data) => {
-      console.log(data); // Log the data to inspect its structure
+      console.log(data);
       commissionsData = data.slice(1); // Exclude the first entry which is the month's name
-      filteredData = commissionsData;
-      currentPage = 1;
-      if (commissionsData.length === 0) {
-        displayNoRecordsMessage();
-      } else {
-        // Set the month's name
-        document.getElementById("month-name").innerText = data[0].month; // Access the month's name correctly
-        populateCommissionsTable();
-        paginateTable("commissions-table", currentPage);
+
+      // Set the month's name
+      if (data.length > 0) {
+        document.getElementById("month-name").innerText = data[0].month;
       }
+
+      // Split data based on status
+      splitDataByStatus();
+
+      // Populate both tables
+      populateConfirmedTable();
+      populateWaitlistTable();
+
+      // Initialize pagination for both tables
+      paginateTable("confirmed-table", 1);
+      paginateTable("waitlist-table", 1);
     })
     .catch((error) => console.error("Error fetching data:", error));
 }
 
-function displayNoRecordsMessage() {
-  const tableBody = document.querySelector("#commissions-table tbody");
-  tableBody.innerHTML = "<tr><td colspan='6'>No records available.</td></tr>";
-  document.getElementById("commissions-table-prev").disabled = true;
-  document.getElementById("commissions-table-next").disabled = true;
+function splitDataByStatus() {
+  confirmedData = commissionsData.filter((item) => item.status && item.status.toLowerCase() === "confirmed");
+
+  waitlistData = commissionsData.filter((item) => !item.status || item.status.toLowerCase() !== "confirmed");
+
+  // Initialize filtered data
+  filteredConfirmedData = confirmedData;
+  filteredWaitlistData = waitlistData;
 }
 
-function populateCommissionsTable() {
-  const tableBody = document.querySelector("#commissions-table tbody");
+function displayNoRecordsMessage(tableId) {
+  const tableBody = document.querySelector(`#${tableId} tbody`);
+  tableBody.innerHTML = "<tr><td colspan='6'>No records available.</td></tr>";
+
+  const prevBtn = document.getElementById(`${tableId}-prev`);
+  const nextBtn = document.getElementById(`${tableId}-next`);
+  const firstBtn = document.getElementById(`${tableId}-first`);
+  const lastBtn = document.getElementById(`${tableId}-last`);
+
+  if (prevBtn && nextBtn && firstBtn && lastBtn) {
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    firstBtn.disabled = true;
+    lastBtn.disabled = true;
+  }
+}
+
+function populateConfirmedTable() {
+  const tableBody = document.querySelector("#confirmed-table tbody");
   tableBody.innerHTML = "";
 
-  const dataToDisplay = filteredData.length > 0 ? filteredData : commissionsData;
+  const dataToDisplay = filteredConfirmedData.length > 0 ? filteredConfirmedData : confirmedData;
+
+  if (dataToDisplay.length === 0) {
+    displayNoRecordsMessage("confirmed-table");
+    return;
+  }
 
   dataToDisplay.forEach((item) => {
     const row = document.createElement("tr");
     const progressValue = item.progress;
     const progressPercentage = getProgressPercentage(progressValue);
 
-    const statusClass = item.status.toLowerCase() === "confirmed" ? "status-confirmed" : "";
-    const inProgressClass = item.status.toLowerCase() === "in progress" ? "status-in-progress" : ""; // New class for "In Progress"
-
     row.innerHTML = `
-            <td>${item.name}</td>
-            <td class="${statusClass} ${inProgressClass}">${item.status !== undefined ? item.status : "N/A"}</td>
-            <td>${formatDate(item.startDate)}</td>
-            <td>${item.type}</td>
-            <td>${item.estimatedTime !== undefined ? item.estimatedTime : "N/A"}</td>
-            <td>
-                ${progressValue !== undefined ? progressValue : "N/A"}
-                <div class="progress-bar">
-                    <div class="progress" style="width: ${progressPercentage}%;"></div>
-                </div>
-            </td>
-        `;
+      <td>${item.name}</td>
+      <td class="status-confirmed">${item.status !== undefined ? item.status : "N/A"}</td>
+      <td>${formatDate(item.startDate)}</td>
+      <td>${item.type}</td>
+      <td>${item.estimatedTime !== undefined ? item.estimatedTime : "N/A"}</td>
+      <td>
+        ${progressValue !== undefined ? progressValue : "N/A"}
+        <div class="progress-bar">
+          <div class="progress" style="width: ${progressPercentage}%;"></div>
+        </div>
+      </td>
+    `;
     tableBody.appendChild(row);
   });
 }
-function filterTable(tableId, filterId) {
+
+function populateWaitlistTable() {
+  const tableBody = document.querySelector("#waitlist-table tbody");
+  tableBody.innerHTML = "";
+
+  const dataToDisplay = filteredWaitlistData.length > 0 ? filteredWaitlistData : waitlistData;
+
+  if (dataToDisplay.length === 0) {
+    displayNoRecordsMessage("waitlist-table");
+    return;
+  }
+
+  dataToDisplay.forEach((item) => {
+    const row = document.createElement("tr");
+    const progressValue = item.progress;
+    const progressPercentage = getProgressPercentage(progressValue);
+
+    const statusClass = item.status && item.status.toLowerCase() === "in progress" ? "status-in-progress" : "";
+
+    row.innerHTML = `
+      <td>${item.name}</td>
+      <td class="${statusClass}">${item.status !== undefined ? item.status : "N/A"}</td>
+      <td>${formatDate(item.startDate)}</td>
+      <td>${item.type}</td>
+      <td>${item.estimatedTime !== undefined ? item.estimatedTime : "N/A"}</td>
+      <td>
+        ${progressValue !== undefined ? progressValue : "N/A"}
+        <div class="progress-bar">
+          <div class="progress" style="width: ${progressPercentage}%;"></div>
+        </div>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+function filterTables(filterId) {
   const input = document.getElementById(filterId);
   const filter = input.value.toLowerCase();
 
-  filteredData = commissionsData.filter((item) => {
+  // Filter confirmed data
+  filteredConfirmedData = confirmedData.filter((item) => {
     return Object.values(item).some((value) => String(value).toLowerCase().includes(filter));
   });
 
-  currentPage = 1;
-  if (filteredData.length === 0) {
-    displayNoRecordsMessage();
-  } else {
-    populateCommissionsTable();
-    paginateTable(tableId, currentPage);
-  }
+  // Filter waitlist data
+  filteredWaitlistData = waitlistData.filter((item) => {
+    return Object.values(item).some((value) => String(value).toLowerCase().includes(filter));
+  });
+
+  // Reset to first page for both tables
+  currentConfirmedPage = 1;
+  currentWaitlistPage = 1;
+
+  // Repopulate and paginate both tables
+  populateConfirmedTable();
+  populateWaitlistTable();
+  paginateTable("confirmed-table", 1);
+  paginateTable("waitlist-table", 1);
 }
 
 function getProgressPercentage(progress) {
@@ -178,7 +290,7 @@ function getProgressPercentage(progress) {
 }
 
 function formatDate(dateString) {
-  if (dateString === "-") {
+  if (!dateString || dateString === "-") {
     return "-";
   }
   const date = new Date(dateString);

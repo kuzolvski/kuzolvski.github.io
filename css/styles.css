@@ -336,3 +336,56 @@ footer .social-icons a:hover {
     flex-direction: column; /* Stack pagination buttons vertically */
   }
 }
+/* Side-by-side tables container */
+.tables-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.table-column {
+  flex: 1;
+  min-width: 300px; /* Minimum width for each table column */
+}
+
+/* Style for the month display */
+.month-display {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+#month-name {
+  font-size: 1.5rem;
+  color: #855d5d;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .tables-container {
+    flex-direction: column;
+  }
+
+  .table-column {
+    width: 100%;
+  }
+}
+
+/* Add spacing between tables */
+h3 {
+  margin-top: 2rem;
+  color: #855d5d;
+}
+
+/* Style for the month display */
+.month-display {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+#month-name {
+  font-size: 1.5rem;
+  color: #855d5d;
+  margin: 0;
+}
