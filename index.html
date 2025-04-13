@@ -22,46 +22,69 @@
     </nav>
     <div class="container" id="commissions">
       <h2 class="table-head">Current Commissions</h2>
-      <h3 id="month-name"></h3>
-      <!-- New element for displaying the month's name -->
+      <div class="month-display">
+        <h3 id="month-name"></h3>
+      </div>
+
       <div class="table-header">
         <div class="search-container">
-          <input type="text" id="commissions-filter" placeholder="Search Commissions..." onkeyup="filterTable('commissions-table', 'commissions-filter')" />
+          <input type="text" id="commissions-filter" placeholder="Search Commissions..." onkeyup="filterTables('commissions-filter')" />
         </div>
       </div>
-      <table id="commissions-table" class="table-main">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Start Date</th>
-            <th>Type</th>
-            <th>Estimated Time</th>
-            <th>Progress</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Data will be populated from Google Sheets -->
-        </tbody>
-      </table>
-      <div class="pagination">
-        <div class="pagination-controls">
-          <button id="commissions-table-first" onclick="changePage('commissions-table','first')"><<</button>
-          <button id="commissions-table-prev" onclick="changePage('commissions-table', -1)">&larr;</button>
-          <span id="page-numbers"></span>
-          <button id="commissions-table-next" onclick="changePage('commissions-table', 1)">&rarr;</button>
-          <button id="commissions-table-last" onclick="changePage('commissions-table', 'last')">>></button>
+
+      <div class="tables-container">
+        <div class="table-column">
+          <h3>Confirmed Commissions</h3>
+          <div class="table-wrapper">
+            <table id="confirmed-table" class="table-main">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Status</th>
+                  <th>Start Date</th>
+                  <th>Type</th>
+                  <th>Estimated Time</th>
+                  <th>Progress</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Confirmed commissions will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-column">
+          <h3>Waitlist</h3>
+          <div class="table-wrapper">
+            <table id="waitlist-table" class="table-main">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Submitted Date</th>
+                  <th>Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Waitlist commissions will be populated here -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
     <footer>
-      <p>&copy; 2023 Kuzolvskicomm. All rights reserved.</p>
+      <p>&copy; 2024 Kuzolvskicomm. All rights reserved.</p>
       <div class="social-icons">
         <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
         <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
         <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
         <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin-in"></i></a>
       </div>
+      <ol>
+        <li>Please note that the order of requests in this table does not reflect the order in which they will be completed. I appreciate your understanding!</li>
+        <li>If your request is not completed by the end of the current batch, it will be carried over to the next batch for completion.</li>
+      </ol>
     </footer>
     <script src="js/index.js"></script>
   </body>
