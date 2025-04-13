@@ -123,6 +123,9 @@ function changePage(tableId, direction) {
 
 document.addEventListener("DOMContentLoaded", () => {
   loadGoogleSheetData();
+
+  // Listen for window resize to adjust table heights
+  window.addEventListener("resize", equalizeTableWrapperHeights);
 });
 
 function loadGoogleSheetData() {
@@ -152,6 +155,10 @@ function loadGoogleSheetData() {
       // Initialize pagination for both tables
       paginateTable("confirmed-table", 1);
       paginateTable("waitlist-table", 1);
+
+      // Equalize table heights after population
+      equalizeTableWrapperHeights();
+      equalizeTableHeaderHeights(); // Ensure header heights are equal
     })
     .catch((error) => console.error("Error fetching data:", error));
 }
@@ -168,7 +175,11 @@ function splitDataByStatus() {
 
 function displayNoRecordsMessage(tableId) {
   const tableBody = document.querySelector(`#${tableId} tbody`);
-  tableBody.innerHTML = "<tr><td colspan='6'>No records available.</td></tr>";
+
+  // Check how many columns the table has
+  const headerCells = document.querySelectorAll(`#${tableId} thead th`).length;
+
+  tableBody.innerHTML = `<tr><td colspan="${headerCells}">No records available.</td></tr>`;
 
   const prevBtn = document.getElementById(`${tableId}-prev`);
   const nextBtn = document.getElementById(`${tableId}-next`);
@@ -214,6 +225,10 @@ function populateConfirmedTable() {
     `;
     tableBody.appendChild(row);
   });
+
+  // Call after populating
+  equalizeTableWrapperHeights();
+  equalizeTableHeaderHeights(); // Ensure header heights are equal
 }
 
 function populateWaitlistTable() {
@@ -229,26 +244,18 @@ function populateWaitlistTable() {
 
   dataToDisplay.forEach((item) => {
     const row = document.createElement("tr");
-    const progressValue = item.progress;
-    const progressPercentage = getProgressPercentage(progressValue);
-
-    const statusClass = item.status && item.status.toLowerCase() === "in progress" ? "status-in-progress" : "";
 
     row.innerHTML = `
       <td>${item.name}</td>
-      <td class="${statusClass}">${item.status !== undefined ? item.status : "N/A"}</td>
       <td>${formatDate(item.startDate)}</td>
       <td>${item.type}</td>
-      <td>${item.estimatedTime !== undefined ? item.estimatedTime : "N/A"}</td>
-      <td>
-        ${progressValue !== undefined ? progressValue : "N/A"}
-        <div class="progress-bar">
-          <div class="progress" style="width: ${progressPercentage}%;"></div>
-        </div>
-      </td>
     `;
     tableBody.appendChild(row);
   });
+
+  // Call after populating
+  equalizeTableWrapperHeights();
+  equalizeTableHeaderHeights(); // Ensure header heights are equal
 }
 
 function filterTables(filterId) {
@@ -265,15 +272,81 @@ function filterTables(filterId) {
     return Object.values(item).some((value) => String(value).toLowerCase().includes(filter));
   });
 
-  // Reset to first page for both tables
-  currentConfirmedPage = 1;
-  currentWaitlistPage = 1;
-
-  // Repopulate and paginate both tables
+  // Repopulate both tables
   populateConfirmedTable();
   populateWaitlistTable();
+
+  // Reset pagination for both tables
   paginateTable("confirmed-table", 1);
   paginateTable("waitlist-table", 1);
+
+  // Re-equalize table heights after filtering
+  equalizeTableWrapperHeights();
+  equalizeTableHeaderHeights(); // Ensure header heights are equal
+}
+
+// Function to equalize table wrapper heights
+function equalizeTableWrapperHeights() {
+  const wrappers = document.querySelectorAll(".table-wrapper");
+  let maxHeight = 0;
+
+  // Find the maximum content height (not including the header)
+  wrappers.forEach((wrapper) => {
+    // First reset heights to auto to get true content height
+    wrapper.style.height = "auto";
+
+    const table = wrapper.querySelector("table");
+    const thead = table.querySelector("thead");
+    const tbody = table.querySelector("tbody");
+
+    // Calculate content height (table height minus header height)
+    const contentHeight = tbody.getBoundingClientRect().height;
+
+    if (contentHeight > maxHeight) {
+      maxHeight = contentHeight;
+    }
+  });
+
+  // Set minimum height
+  maxHeight = Math.max(maxHeight, 200);
+
+  // Set maximum height (with scrolling)
+  maxHeight = Math.min(maxHeight, 400);
+
+  // Set all wrappers to the same height
+  wrappers.forEach((wrapper) => {
+    const headerHeight = wrapper.querySelector("table thead").getBoundingClientRect().height;
+    wrapper.style.height = maxHeight + headerHeight + "px";
+  });
+}
+
+// Function to equalize table header heights
+function equalizeTableHeaderHeights() {
+  // Get all table headers on the index page
+  const tableHeaders = document.querySelectorAll("#confirmed-table thead, #waitlist-table thead");
+
+  // Find the maximum height
+  let maxHeight = 0;
+  tableHeaders.forEach((header) => {
+    // Reset any previously set inline height to get true height
+    header.style.height = "auto";
+    const headerHeight = header.offsetHeight;
+    if (headerHeight > maxHeight) {
+      maxHeight = headerHeight;
+    }
+  });
+
+  // Set all headers to the maximum height
+  maxHeight = Math.max(maxHeight, 50); // Minimum of 50px
+  tableHeaders.forEach((header) => {
+    header.style.height = maxHeight + "px";
+
+    // Also ensure all th elements have the same height
+    const thElements = header.querySelectorAll("th");
+    thElements.forEach((th) => {
+      th.style.height = maxHeight + "px";
+    });
+  });
 }
 
 function getProgressPercentage(progress) {

@@ -35,57 +35,40 @@
       <div class="tables-container">
         <div class="table-column">
           <h3>Confirmed Commissions</h3>
-          <table id="confirmed-table" class="table-main">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Start Date</th>
-                <th>Type</th>
-                <th>Estimated Time</th>
-                <th>Progress</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Confirmed commissions will be populated here -->
-            </tbody>
-          </table>
-          <div class="pagination">
-            <div class="pagination-controls">
-              <button id="confirmed-table-first" onclick="changePage('confirmed-table','first')"><<</button>
-              <button id="confirmed-table-prev" onclick="changePage('confirmed-table', -1)">&larr;</button>
-              <span id="confirmed-page-numbers"></span>
-              <button id="confirmed-table-next" onclick="changePage('confirmed-table', 1)">&rarr;</button>
-              <button id="confirmed-table-last" onclick="changePage('confirmed-table', 'last')">>></button>
-            </div>
+          <div class="table-wrapper">
+            <table id="confirmed-table" class="table-main">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Status</th>
+                  <th>Start Date</th>
+                  <th>Type</th>
+                  <th>Estimated Time</th>
+                  <th>Progress</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Confirmed commissions will be populated here -->
+              </tbody>
+            </table>
           </div>
         </div>
 
         <div class="table-column">
           <h3>Waitlist</h3>
-          <table id="waitlist-table" class="table-main">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Start Date</th>
-                <th>Type</th>
-                <th>Estimated Time</th>
-                <th>Progress</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Waitlist commissions will be populated here -->
-            </tbody>
-          </table>
-          <div class="pagination">
-            <div class="pagination-controls">
-              <button id="waitlist-table-first" onclick="changePage('waitlist-table','first')"><<</button>
-              <button id="waitlist-table-prev" onclick="changePage('waitlist-table', -1)">&larr;</button>
-              <span id="waitlist-page-numbers"></span>
-              <button id="waitlist-table-next" onclick="changePage('waitlist-table', 1)">&rarr;</button>
-              <button id="waitlist-table-last" onclick="changePage('waitlist-table', 'last')">>></button>
-            </div>
+          <div class="table-wrapper">
+            <table id="waitlist-table" class="table-main">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Submitted Date</th>
+                  <th>Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Waitlist commissions will be populated here -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
