@@ -1,126 +1,10 @@
-let currentConfirmedPage = 1;
-let currentWaitlistPage = 1;
-const rowsPerPage = 7;
 let commissionsData = [];
 let confirmedData = [];
 let waitlistData = [];
 let filteredConfirmedData = [];
 let filteredWaitlistData = [];
 
-function paginateTable(tableId, page) {
-  const table = document.getElementById(tableId);
-  const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-
-  // Determine which dataset to use based on the table ID
-  let totalData, filteredData;
-  if (tableId === "confirmed-table") {
-    totalData = filteredConfirmedData.length > 0 ? filteredConfirmedData.length : confirmedData.length;
-    currentConfirmedPage = page;
-  } else if (tableId === "waitlist-table") {
-    totalData = filteredWaitlistData.length > 0 ? filteredWaitlistData.length : waitlistData.length;
-    currentWaitlistPage = page;
-  }
-
-  const totalPages = Math.ceil(totalData / rowsPerPage);
-
-  // Hide all rows
-  for (let i = 0; i < rows.length; i++) {
-    rows[i].style.display = "none";
-  }
-
-  // Show rows for the current page
-  for (let i = (page - 1) * rowsPerPage; i < page * rowsPerPage && i < totalData; i++) {
-    if (i < rows.length) {
-      rows[i].style.display = "";
-    }
-  }
-
-  // Disable buttons based on the current page
-  const prevBtn = document.getElementById(`${tableId}-prev`);
-  const nextBtn = document.getElementById(`${tableId}-next`);
-  const firstBtn = document.getElementById(`${tableId}-first`);
-  const lastBtn = document.getElementById(`${tableId}-last`);
-
-  if (prevBtn && nextBtn && firstBtn && lastBtn) {
-    prevBtn.disabled = page === 1;
-    nextBtn.disabled = page === totalPages;
-    firstBtn.disabled = page === 1;
-    lastBtn.disabled = page === totalPages;
-  }
-
-  renderPageNumbers(tableId, totalPages, page);
-}
-
-function renderPageNumbers(tableId, totalPages, currentPage) {
-  let pageNumbersId;
-  if (tableId === "confirmed-table") {
-    pageNumbersId = "confirmed-page-numbers";
-  } else if (tableId === "waitlist-table") {
-    pageNumbersId = "waitlist-page-numbers";
-  }
-
-  const pageNumbersContainer = document.getElementById(pageNumbersId);
-  if (!pageNumbersContainer) return;
-
-  pageNumbersContainer.innerHTML = "";
-
-  const maxVisiblePages = window.innerWidth < 440 ? 1 : 3;
-  let startPage, endPage;
-
-  if (totalPages <= maxVisiblePages) {
-    startPage = 1;
-    endPage = totalPages;
-  } else {
-    const halfVisible = Math.floor(maxVisiblePages / 2);
-    startPage = Math.max(1, currentPage - halfVisible);
-    endPage = Math.min(totalPages, currentPage + halfVisible);
-
-    if (startPage === 1) {
-      endPage = Math.min(maxVisiblePages, totalPages);
-    } else if (endPage === totalPages) {
-      startPage = Math.max(1, totalPages - maxVisiblePages + 1);
-    }
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    const pageButton = document.createElement("button");
-    pageButton.innerText = i;
-    pageButton.className = currentPage === i ? "active" : "";
-    pageButton.onclick = () => {
-      paginateTable(tableId, i);
-    };
-    pageNumbersContainer.appendChild(pageButton);
-  }
-}
-
-function changePage(tableId, direction) {
-  let currentPage, totalData;
-
-  if (tableId === "confirmed-table") {
-    currentPage = currentConfirmedPage;
-    totalData = filteredConfirmedData.length > 0 ? filteredConfirmedData.length : confirmedData.length;
-  } else if (tableId === "waitlist-table") {
-    currentPage = currentWaitlistPage;
-    totalData = filteredWaitlistData.length > 0 ? filteredWaitlistData.length : waitlistData.length;
-  }
-
-  const totalPages = Math.ceil(totalData / rowsPerPage);
-
-  if (direction === "first") {
-    currentPage = 1;
-  } else if (direction === "last") {
-    currentPage = totalPages;
-  } else {
-    currentPage += direction;
-  }
-
-  // Ensure currentPage stays within bounds
-  if (currentPage < 1) currentPage = 1;
-  if (currentPage > totalPages) currentPage = totalPages;
-
-  paginateTable(tableId, currentPage);
-}
-
+// Remove pagination for scrolling to work properly
 document.addEventListener("DOMContentLoaded", () => {
   loadGoogleSheetData();
 
@@ -148,24 +32,32 @@ function loadGoogleSheetData() {
       // Split data based on status
       splitDataByStatus();
 
-      // Populate both tables
+      // Populate both tables with all data, no pagination
       populateConfirmedTable();
       populateWaitlistTable();
-
-      // Initialize pagination for both tables
-      paginateTable("confirmed-table", 1);
-      paginateTable("waitlist-table", 1);
 
       // Equalize table heights after population
       equalizeTableWrapperHeights();
       equalizeTableHeaderHeights(); // Ensure header heights are equal
+
+      // Hide pagination elements since we're using scrolling
+      hidePaginationElements();
     })
     .catch((error) => console.error("Error fetching data:", error));
 }
 
+function hidePaginationElements() {
+  // Hide pagination elements
+  const paginationControls = document.querySelectorAll(".pagination-controls");
+  paginationControls.forEach((control) => {
+    if (control) {
+      control.style.display = "none";
+    }
+  });
+}
+
 function splitDataByStatus() {
   confirmedData = commissionsData.filter((item) => item.status && item.status.toLowerCase() === "confirmed");
-
   waitlistData = commissionsData.filter((item) => !item.status || item.status.toLowerCase() !== "confirmed");
 
   // Initialize filtered data
@@ -180,18 +72,6 @@ function displayNoRecordsMessage(tableId) {
   const headerCells = document.querySelectorAll(`#${tableId} thead th`).length;
 
   tableBody.innerHTML = `<tr><td colspan="${headerCells}">No records available.</td></tr>`;
-
-  const prevBtn = document.getElementById(`${tableId}-prev`);
-  const nextBtn = document.getElementById(`${tableId}-next`);
-  const firstBtn = document.getElementById(`${tableId}-first`);
-  const lastBtn = document.getElementById(`${tableId}-last`);
-
-  if (prevBtn && nextBtn && firstBtn && lastBtn) {
-    prevBtn.disabled = true;
-    nextBtn.disabled = true;
-    firstBtn.disabled = true;
-    lastBtn.disabled = true;
-  }
 }
 
 function populateConfirmedTable() {
@@ -228,7 +108,7 @@ function populateConfirmedTable() {
 
   // Call after populating
   equalizeTableWrapperHeights();
-  equalizeTableHeaderHeights(); // Ensure header heights are equal
+  equalizeTableHeaderHeights();
 }
 
 function populateWaitlistTable() {
@@ -255,7 +135,7 @@ function populateWaitlistTable() {
 
   // Call after populating
   equalizeTableWrapperHeights();
-  equalizeTableHeaderHeights(); // Ensure header heights are equal
+  equalizeTableHeaderHeights();
 }
 
 function filterTables(filterId) {
@@ -272,51 +152,28 @@ function filterTables(filterId) {
     return Object.values(item).some((value) => String(value).toLowerCase().includes(filter));
   });
 
-  // Repopulate both tables
+  // Repopulate both tables with filtered data
   populateConfirmedTable();
   populateWaitlistTable();
 
-  // Reset pagination for both tables
-  paginateTable("confirmed-table", 1);
-  paginateTable("waitlist-table", 1);
-
   // Re-equalize table heights after filtering
   equalizeTableWrapperHeights();
-  equalizeTableHeaderHeights(); // Ensure header heights are equal
+  equalizeTableHeaderHeights();
 }
 
 // Function to equalize table wrapper heights
 function equalizeTableWrapperHeights() {
   const wrappers = document.querySelectorAll(".table-wrapper");
-  let maxHeight = 0;
 
-  // Find the maximum content height (not including the header)
+  // First reset heights to auto to get true content heights
   wrappers.forEach((wrapper) => {
-    // First reset heights to auto to get true content height
     wrapper.style.height = "auto";
-
-    const table = wrapper.querySelector("table");
-    const thead = table.querySelector("thead");
-    const tbody = table.querySelector("tbody");
-
-    // Calculate content height (table height minus header height)
-    const contentHeight = tbody.getBoundingClientRect().height;
-
-    if (contentHeight > maxHeight) {
-      maxHeight = contentHeight;
-    }
   });
 
-  // Set minimum height
-  maxHeight = Math.max(maxHeight, 200);
-
-  // Set maximum height (with scrolling)
-  maxHeight = Math.min(maxHeight, 400);
-
-  // Set all wrappers to the same height
+  // Set a fixed height that allows scrolling
   wrappers.forEach((wrapper) => {
-    const headerHeight = wrapper.querySelector("table thead").getBoundingClientRect().height;
-    wrapper.style.height = maxHeight + headerHeight + "px";
+    wrapper.style.height = "500px"; // Taller height to enable scrolling
+    wrapper.style.overflowY = "auto"; // Ensure vertical scroll is enabled
   });
 }
 
