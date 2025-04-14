@@ -1,19 +1,19 @@
 let currentPage = 1;
 const rowsPerPage = 10;
 let historyData = [];
-let filteredData = []; // New array to hold filtered data
+let filteredData = [];
 
 async function fetchData() {
-  const response = await fetch("https://script.google.com/macros/s/AKfycbzrXUb_Sb_QhELUwkfQzo34gKgX04HXW2qxRA-ndWeSydz1DXVMEsVdJMgqcJ1-8jfYng/exec"); // Replace with your web app URL
+  const response = await fetch("https://script.google.com/macros/s/AKfycbzrXUb_Sb_QhELUwkfQzo34gKgX04HXW2qxRA-ndWeSydz1DXVMEsVdJMgqcJ1-8jfYng/exec");
   const data = await response.json();
-  historyData = data; // Store the fetched data
-  filteredData = historyData; // Initialize filtered data
-  renderTable(); // Render the table after fetching data
+  historyData = data;
+  filteredData = historyData;
+  renderTable();
 }
 
 function formatDate(dateString) {
   if (dateString === "-") {
-    return "-"; // Return "-" if the input is "-"
+    return "-";
   }
   const date = new Date(dateString);
   const options = { year: "numeric", month: "long", day: "numeric" };
@@ -22,35 +22,90 @@ function formatDate(dateString) {
 
 function renderTable() {
   const tableBody = document.querySelector("#history-table tbody");
-  tableBody.innerHTML = ""; // Clear existing rows
 
-  const dataToDisplay = filteredData.length > 0 ? filteredData : historyData; // Use filtered data if available
+  // Clear the table body without affecting the header
+  tableBody.innerHTML = "";
+
+  const dataToDisplay = filteredData.length > 0 ? filteredData : historyData;
   const start = (currentPage - 1) * rowsPerPage;
   const end = start + rowsPerPage;
   const paginatedData = dataToDisplay.slice(start, end);
 
-  paginatedData.forEach((item) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${formatDate(item.startDate)}</td>
-            <td>${item.type}</td>
-            <td>${item.status}</td>
-        `;
-    tableBody.appendChild(row);
-  });
+  if (paginatedData.length === 0) {
+    displayNoRecordsMessage();
+    return;
+  }
 
+  // Add empty rows to fill the table with consistent height
+  const totalRows = rowsPerPage;
+
+  for (let i = 0; i < totalRows; i++) {
+    const row = document.createElement("tr");
+    if (i < paginatedData.length) {
+      // Add actual data
+      const item = paginatedData[i];
+      row.innerHTML = `
+        <td>${item.name}</td>
+        <td>${formatDate(item.startDate)}</td>
+        <td>${item.type}</td>
+        <td>${item.status}</td>
+      `;
+    } else {
+      // Add empty row to maintain table height
+      row.innerHTML = `
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      `;
+      row.style.visibility = "hidden"; // Hide empty rows but maintain space
+    }
+    tableBody.appendChild(row);
+  }
+
+  // Update pagination buttons state
   document.getElementById("history-table-prev").disabled = currentPage === 1;
-  document.getElementById("history-table-next").disabled = currentPage === Math.ceil(dataToDisplay.length / rowsPerPage);
+  document.getElementById("history-table-first").disabled = currentPage === 1;
+
+  const totalPages = Math.ceil(dataToDisplay.length / rowsPerPage);
+  document.getElementById("history-table-next").disabled = currentPage === totalPages || totalPages === 0;
+  document.getElementById("history-table-last").disabled = currentPage === totalPages || totalPages === 0;
 
   renderPageNumbers(dataToDisplay.length);
+
+  // Fix header and ensure consistent width
+  fixTableHeader();
+}
+
+function fixTableHeader() {
+  // Ensure the headers have consistent width
+  const table = document.getElementById("history-table");
+  const ths = table.querySelectorAll("thead th");
+  const firstRowCells = table.querySelectorAll("tbody tr:first-child td");
+
+  // Only proceed if both header and body cells exist
+  if (ths.length > 0 && firstRowCells.length > 0) {
+    // Force table to calculate widths correctly
+    table.style.tableLayout = "fixed";
+
+    // Ensure the thead is properly positioned
+    const thead = table.querySelector("thead");
+    thead.style.position = "sticky";
+    thead.style.top = "0";
+    thead.style.zIndex = "10";
+  }
 }
 
 function renderPageNumbers(totalItems) {
   const pageNumbersContainer = document.getElementById("page-numbers");
   pageNumbersContainer.innerHTML = "";
   const totalPages = Math.ceil(totalItems / rowsPerPage);
-  const maxVisiblePages = window.innerWidth < 440 ? 1 : 3; // Show 1 page button on small screens, 3 on larger screens
+
+  if (totalPages === 0) {
+    return;
+  }
+
+  const maxVisiblePages = window.innerWidth < 440 ? 1 : 3;
   let startPage, endPage;
 
   if (totalPages <= maxVisiblePages) {
@@ -74,7 +129,7 @@ function renderPageNumbers(totalItems) {
     pageButton.className = currentPage === i ? "active" : "";
     pageButton.onclick = () => {
       currentPage = i;
-      renderTable(); // Re-render the table with the new page
+      renderTable();
     };
     pageNumbersContainer.appendChild(pageButton);
   }
@@ -85,27 +140,40 @@ function changePage(direction) {
   const totalPages = Math.ceil(totalItems / rowsPerPage);
 
   if (direction === "first") {
-    currentPage = 1; // Go to the first page
+    currentPage = 1;
   } else if (direction === "last") {
-    currentPage = totalPages; // Go to the last page
+    currentPage = totalPages;
   } else {
-    currentPage += direction; // For next and previous buttons
+    currentPage += direction;
   }
 
   if (currentPage < 1) currentPage = 1;
   if (currentPage > totalPages) currentPage = totalPages;
 
-  renderTable(); // Call renderTable to update the display
+  renderTable();
 }
 
 function displayNoRecordsMessage() {
   const tableBody = document.querySelector("#history-table tbody");
-  tableBody.innerHTML = "<tr><td colspan='6'>No records available.</td></tr>";
+  const headerCells = document.querySelectorAll("#history-table thead th").length;
+
+  // Create a single row with the message
+  tableBody.innerHTML = `<tr><td colspan="${headerCells}">No records available.</td></tr>`;
+
+  // Add additional empty rows to maintain table height
+  for (let i = 1; i < rowsPerPage; i++) {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td colspan="${headerCells}">&nbsp;</td>`;
+    row.style.visibility = "hidden"; // Hide empty rows but maintain space
+    tableBody.appendChild(row);
+  }
+
   document.getElementById("history-table-prev").disabled = true;
   document.getElementById("history-table-next").disabled = true;
+  document.getElementById("history-table-first").disabled = true;
+  document.getElementById("history-table-last").disabled = true;
 }
 
-// Function to filter the table based on user input
 function filterTable(tableId, filterId) {
   const input = document.getElementById(filterId);
   const filter = input.value.toLowerCase();
@@ -115,13 +183,15 @@ function filterTable(tableId, filterId) {
     return Object.values(item).some((value) => String(value).toLowerCase().includes(filter));
   });
 
-  currentPage = 1;
-  if (filteredData.length === 0) {
-    displayNoRecordsMessage();
-  } else {
-    renderTable();
-  } // Reset to the first page after filtering // Render the table with filtered data
+  currentPage = 1; // Reset to first page after filtering
+  renderTable();
 }
+
+// Add window resize listener to handle table adjustments
+window.addEventListener("resize", () => {
+  renderPageNumbers(filteredData.length > 0 ? filteredData.length : historyData.length);
+  fixTableHeader();
+});
 
 // Call fetchData when the page loads
 window.onload = fetchData;

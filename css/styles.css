@@ -134,15 +134,22 @@ h2 {
   line-height: 30px; /* Vertically center the text */
 }
 
-/* Table wrapper - increased height */
+/* Table wrapper - consistent height and scrolling */
 .table-wrapper {
   overflow-x: auto;
-  overflow-y: auto; /* Allow vertical scrolling */
+  overflow-y: auto !important; /* Force vertical scrolling */
   border-radius: 8px;
   box-shadow: 0 2px 15px rgba(186, 131, 131, 0.15);
   background-color: white;
-  max-height: 650px; /* Increased from 500px */
-  min-height: 450px; /* Added minimum height */
+  height: 500px !important; /* Fixed height to force scrolling */
+  min-height: 300px; /* Minimum height */
+  max-height: 500px; /* Maximum height */
+}
+
+/* Make history page table wrapper slightly shorter to accommodate pagination */
+#history .table-wrapper {
+  height: 400px !important;
+  max-height: 400px;
 }
 
 /* Index Page Table Styles */
@@ -150,6 +157,7 @@ h2 {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  margin: 0; /* Remove margin to prevent shifting */
 }
 
 .table-main tbody tr {
@@ -176,11 +184,11 @@ h2 {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 15px rgba(186, 131, 131, 0.15);
+  margin: 0; /* Remove margin to prevent shifting */
+  box-shadow: none; /* Remove shadow as it's applied to the wrapper */
   background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: 0; /* Remove border radius as it's applied to the wrapper */
+  overflow: visible; /* Allow content to overflow for scrolling */
 }
 
 .table tbody tr,
@@ -229,7 +237,7 @@ h2 {
 
 /* Pagination Styles */
 .pagination {
-  margin: 20px 0;
+  margin: 15px 0;
   display: flex;
   justify-content: center;
 }
@@ -433,4 +441,14 @@ footer li {
     display: table-cell;
     height: 50px !important; /* Maintain consistent height on mobile */
   }
+}
+
+/* Ensure consistent heading spacing in history page */
+#history h2 {
+  margin-bottom: 20px;
+}
+
+/* Ensure consistent search container spacing */
+#history .table-header {
+  margin-bottom: 15px;
 }

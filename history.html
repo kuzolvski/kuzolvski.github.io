@@ -27,19 +27,22 @@
           <input type="text" id="history-filter" placeholder="Search History ..." onkeyup="filterTable('history-table', 'history-filter')" />
         </div>
       </div>
-      <table id="history-table" class="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Start Date</th>
-            <th>Type</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Data will be populated from Google Sheets -->
-        </tbody>
-      </table>
+      <!-- Added a wrapper div to match the index page structure -->
+      <div class="table-wrapper">
+        <table id="history-table" class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Start Date</th>
+              <th>Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data will be populated from Google Sheets -->
+          </tbody>
+        </table>
+      </div>
       <div class="pagination">
         <div class="pagination-controls">
           <button id="history-table-first" onclick="changePage('first')"><<</button>
